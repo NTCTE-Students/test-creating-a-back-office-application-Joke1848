@@ -1,0 +1,696 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "name": "Basic",
+  "sources": [
+    {
+      "id": "25c50288-54c1-47e9-b92d-b1c2c8d9772b",
+      "name": "basic.sql",
+      "kind": {
+        "kind": "SqlRemoteFile",
+        "url": "/samples/basic.sql",
+        "size": 1764
+      },
+      "content": [
+        "CREATE TABLE users",
+        "(",
+        "    id          int          NOT NULL,",
+        "    first_name  varchar(255) NOT NULL,",
+        "    last_name   varchar(255) NOT NULL,",
+        "    email       varchar(255),",
+        "    external_id uuid,",
+        "    CONSTRAINT users_pk PRIMARY KEY (id)",
+        ");",
+        "",
+        "CREATE UNIQUE INDEX user_email_uniq ON users (email);",
+        "",
+        "CREATE INDEX user_name_index ON users USING btree (first_name, last_name);",
+        "",
+        "CREATE INDEX user_external_id_index ON users (external_id);",
+        "",
+        "COMMENT ON TABLE users IS 'A table to store all users and in a single diagram control them, for the better or worse!';",
+        "",
+        "COMMENT ON COLUMN users.id IS 'The user id which is automatically defined based on subscription order. Should never change!';",
+        "",
+        "CREATE TABLE roles",
+        "(",
+        "    id          int          NOT NULL,",
+        "    slug        varchar(255) NOT NULL,",
+        "    name        varchar(255) NOT NULL,",
+        "    description text,",
+        "    created_at  timestamp    NOT NULL,",
+        "    updated_at  timestamp    NOT NULL,",
+        "    CONSTRAINT roles_pk PRIMARY KEY (id)",
+        ");",
+        "",
+        "CREATE UNIQUE INDEX roles_slug_uniq ON roles (slug);",
+        "",
+        "CREATE UNIQUE INDEX roles_name_uniq ON roles (name);",
+        "",
+        "CREATE TABLE credentials",
+        "(",
+        "    user_id  int          NOT NULL,",
+        "    login    varchar(255) NOT NULL,",
+        "    password varchar(255) NOT NULL,",
+        "    CONSTRAINT credentials_user_id_fk FOREIGN KEY (user_id) REFERENCES users (id)",
+        ");",
+        "",
+        "CREATE UNIQUE INDEX credentials_login_uniq ON credentials (login);",
+        "",
+        "CREATE TABLE role_user",
+        "(",
+        "    id         int       NOT NULL,",
+        "    role_id    int       NOT NULL,",
+        "    user_id    int       NOT NULL,",
+        "    created_at timestamp NOT NULL,",
+        "    updated_at timestamp NOT NULL,",
+        "    CONSTRAINT role_user_pk PRIMARY KEY (id),",
+        "    CONSTRAINT role_user_role_id_fk FOREIGN KEY (role_id) REFERENCES roles (id),",
+        "    CONSTRAINT role_user_user_id_fk FOREIGN KEY (user_id) REFERENCES users (id)",
+        ");",
+        ""
+      ],
+      "tables": [
+        {
+          "schema": "public",
+          "table": "credentials",
+          "columns": [
+            {
+              "name": "user_id",
+              "type": "int"
+            },
+            {
+              "name": "login",
+              "type": "varchar(255)"
+            },
+            {
+              "name": "password",
+              "type": "varchar(255)"
+            }
+          ],
+          "uniques": [
+            {
+              "name": "credentials_login_uniq",
+              "columns": [
+                "login"
+              ],
+              "definition": "(login)"
+            }
+          ]
+        },
+        {
+          "schema": "public",
+          "table": "role_user",
+          "columns": [
+            {
+              "name": "id",
+              "type": "int"
+            },
+            {
+              "name": "role_id",
+              "type": "int"
+            },
+            {
+              "name": "user_id",
+              "type": "int"
+            },
+            {
+              "name": "created_at",
+              "type": "timestamp"
+            },
+            {
+              "name": "updated_at",
+              "type": "timestamp"
+            }
+          ],
+          "primaryKey": {
+            "name": "role_user_pk",
+            "columns": [
+              "id"
+            ]
+          }
+        },
+        {
+          "schema": "public",
+          "table": "roles",
+          "columns": [
+            {
+              "name": "id",
+              "type": "int"
+            },
+            {
+              "name": "slug",
+              "type": "varchar(255)"
+            },
+            {
+              "name": "name",
+              "type": "varchar(255)"
+            },
+            {
+              "name": "description",
+              "type": "text",
+              "nullable": true
+            },
+            {
+              "name": "created_at",
+              "type": "timestamp"
+            },
+            {
+              "name": "updated_at",
+              "type": "timestamp"
+            }
+          ],
+          "primaryKey": {
+            "name": "roles_pk",
+            "columns": [
+              "id"
+            ]
+          },
+          "uniques": [
+            {
+              "name": "roles_slug_uniq",
+              "columns": [
+                "slug"
+              ],
+              "definition": "(slug)"
+            },
+            {
+              "name": "roles_name_uniq",
+              "columns": [
+                "name"
+              ],
+              "definition": "(name)"
+            }
+          ]
+        },
+        {
+          "schema": "public",
+          "table": "users",
+          "columns": [
+            {
+              "name": "id",
+              "type": "int",
+              "comment": {
+                "text": "The user id which is automatically defined based on subscription order. Should never change!"
+              }
+            },
+            {
+              "name": "first_name",
+              "type": "varchar(255)"
+            },
+            {
+              "name": "last_name",
+              "type": "varchar(255)"
+            },
+            {
+              "name": "email",
+              "type": "varchar(255)",
+              "nullable": true
+            },
+            {
+              "name": "external_id",
+              "type": "uuid",
+              "nullable": true
+            }
+          ],
+          "primaryKey": {
+            "name": "users_pk",
+            "columns": [
+              "id"
+            ]
+          },
+          "uniques": [
+            {
+              "name": "user_email_uniq",
+              "columns": [
+                "email"
+              ],
+              "definition": "(email)"
+            }
+          ],
+          "indexes": [
+            {
+              "name": "user_name_index",
+              "columns": [
+                "first_name",
+                "last_name"
+              ],
+              "definition": "USING btree (first_name, last_name)"
+            },
+            {
+              "name": "user_external_id_index",
+              "columns": [
+                "external_id"
+              ],
+              "definition": "(external_id)"
+            }
+          ],
+          "comment": {
+            "text": "A table to store all users and in a single diagram control them, for the better or worse!"
+          }
+        }
+      ],
+      "relations": [
+        {
+          "name": "credentials_user_id_fk",
+          "src": {
+            "table": "public.credentials",
+            "column": "user_id"
+          },
+          "ref": {
+            "table": "public.users",
+            "column": "id"
+          }
+        },
+        {
+          "name": "role_user_role_id_fk",
+          "src": {
+            "table": "public.role_user",
+            "column": "role_id"
+          },
+          "ref": {
+            "table": "public.roles",
+            "column": "id"
+          }
+        },
+        {
+          "name": "role_user_user_id_fk",
+          "src": {
+            "table": "public.role_user",
+            "column": "user_id"
+          },
+          "ref": {
+            "table": "public.users",
+            "column": "id"
+          }
+        }
+      ],
+      "fromSample": "basic",
+      "createdAt": 1649492400000,
+      "updatedAt": 1649492400000
+    },
+    {
+      "id": "368699da-bec7-4cbb-bd5e-bab536d05c1b",
+      "name": "maksim",
+      "kind": {
+        "kind": "AmlEditor"
+      },
+      "content": [
+        "employees",
+        "  id \"bigint unsigned\"",
+        "  name varchar(155)",
+        "  surname varchar(155)",
+        "  email varchar(155)",
+        "  role enum(admin; manager; employee)",
+        "  password blob",
+        "",
+        "clients",
+        "  id \"bigint unsigned\"",
+        "  name varchar(155)",
+        "  surname varchar(155)",
+        "  email varchar(155)",
+        "  last_commit_date data",
+        "  password blob",
+        "",
+        "orders",
+        "  id \"bigint unsigned\"",
+        "  client_id int",
+        "  order_time&date DateTime",
+        "  employee_id int",
+        "",
+        "Tools",
+        "  id \"bigint unsigned\"",
+        "  type varchar(155)",
+        "  average int",
+        "",
+        "Finances",
+        "  id \"bigint unsigned\"",
+        "  revenues int",
+        "  expenses int",
+        "",
+        "Accountings",
+        "  id \"bigint unsigned\"",
+        "  finance_id int",
+        "  tool_id int",
+        "  employee_id",
+        "  ",
+        "",
+        ""
+      ],
+      "tables": [
+        {
+          "schema": "",
+          "table": "Accountings",
+          "columns": [
+            {
+              "name": "id",
+              "type": "bigint unsigned"
+            },
+            {
+              "name": "finance_id",
+              "type": "int"
+            },
+            {
+              "name": "tool_id",
+              "type": "int"
+            },
+            {
+              "name": "employee_id",
+              "type": "unknown"
+            }
+          ]
+        },
+        {
+          "schema": "",
+          "table": "Finances",
+          "columns": [
+            {
+              "name": "id",
+              "type": "bigint unsigned"
+            },
+            {
+              "name": "revenues",
+              "type": "int"
+            },
+            {
+              "name": "expenses",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "schema": "",
+          "table": "Tools",
+          "columns": [
+            {
+              "name": "id",
+              "type": "bigint unsigned"
+            },
+            {
+              "name": "type",
+              "type": "varchar(155)"
+            },
+            {
+              "name": "average",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "schema": "",
+          "table": "clients",
+          "columns": [
+            {
+              "name": "id",
+              "type": "bigint unsigned"
+            },
+            {
+              "name": "name",
+              "type": "varchar(155)"
+            },
+            {
+              "name": "surname",
+              "type": "varchar(155)"
+            },
+            {
+              "name": "email",
+              "type": "varchar(155)"
+            },
+            {
+              "name": "last_commit_date",
+              "type": "data"
+            },
+            {
+              "name": "password",
+              "type": "blob"
+            }
+          ]
+        },
+        {
+          "schema": "",
+          "table": "employees",
+          "columns": [
+            {
+              "name": "id",
+              "type": "bigint unsigned"
+            },
+            {
+              "name": "name",
+              "type": "varchar(155)"
+            },
+            {
+              "name": "surname",
+              "type": "varchar(155)"
+            },
+            {
+              "name": "email",
+              "type": "varchar(155)"
+            },
+            {
+              "name": "role",
+              "type": "enum"
+            },
+            {
+              "name": "password",
+              "type": "blob"
+            }
+          ]
+        },
+        {
+          "schema": "",
+          "table": "orders",
+          "columns": [
+            {
+              "name": "id",
+              "type": "bigint unsigned"
+            },
+            {
+              "name": "client_id",
+              "type": "int"
+            },
+            {
+              "name": "order_time&date",
+              "type": "DateTime"
+            },
+            {
+              "name": "employee_id",
+              "type": "int"
+            }
+          ]
+        }
+      ],
+      "relations": [],
+      "types": [
+        {
+          "schema": "",
+          "name": "enum",
+          "value": {
+            "enum": [
+              "admin; manager; employee"
+            ]
+          }
+        }
+      ],
+      "createdAt": 1717386270606,
+      "updatedAt": 1717392175608
+    },
+    {
+      "id": "987df7e1-503d-45c0-b81e-4a80ab5f93c1",
+      "name": "default",
+      "kind": {
+        "kind": "AmlEditor"
+      },
+      "content": [
+        "fk orders.client_id -> clients.id",
+        "fk orders.employee_id -> employees.id",
+        "fk Accountings.employee_id -> employees.id",
+        "fk Accountings.finance_id -> Finances.id",
+        "fk Accountings.tool_id -> Tools.id",
+        ""
+      ],
+      "tables": [],
+      "relations": [
+        {
+          "name": "virtual relation",
+          "src": {
+            "table": ".orders",
+            "column": "client_id"
+          },
+          "ref": {
+            "table": ".clients",
+            "column": "id"
+          }
+        },
+        {
+          "name": "virtual relation",
+          "src": {
+            "table": ".orders",
+            "column": "employee_id"
+          },
+          "ref": {
+            "table": ".employees",
+            "column": "id"
+          }
+        },
+        {
+          "name": "virtual relation",
+          "src": {
+            "table": ".Accountings",
+            "column": "employee_id"
+          },
+          "ref": {
+            "table": ".employees",
+            "column": "id"
+          }
+        },
+        {
+          "name": "virtual relation",
+          "src": {
+            "table": ".Accountings",
+            "column": "finance_id"
+          },
+          "ref": {
+            "table": ".Finances",
+            "column": "id"
+          }
+        },
+        {
+          "name": "virtual relation",
+          "src": {
+            "table": ".Accountings",
+            "column": "tool_id"
+          },
+          "ref": {
+            "table": ".Tools",
+            "column": "id"
+          }
+        }
+      ],
+      "createdAt": 1717388298019,
+      "updatedAt": 1717388578275
+    }
+  ],
+  "layouts": {
+    "initial layout": {
+      "tables": [
+        {
+          "id": ".Accountings",
+          "position": {
+            "left": 750,
+            "top": 100
+          },
+          "size": {
+            "width": 205.68333435058594,
+            "height": 141
+          },
+          "color": "fuchsia",
+          "columns": [
+            "id",
+            "finance_id",
+            "tool_id",
+            "employee_id"
+          ]
+        },
+        {
+          "id": ".employees",
+          "position": {
+            "left": 510,
+            "top": 70
+          },
+          "size": {
+            "width": 147.96665954589844,
+            "height": 189
+          },
+          "color": "indigo",
+          "columns": [
+            "id",
+            "name",
+            "surname",
+            "email",
+            "role",
+            "password"
+          ]
+        },
+        {
+          "id": ".Finances",
+          "position": {
+            "left": 1090,
+            "top": 60
+          },
+          "size": {
+            "width": 134.28334045410156,
+            "height": 117
+          },
+          "color": "pink",
+          "columns": [
+            "id",
+            "revenues",
+            "expenses"
+          ]
+        },
+        {
+          "id": ".Tools",
+          "position": {
+            "left": 1070,
+            "top": 200
+          },
+          "size": {
+            "width": 123.98333740234375,
+            "height": 117
+          },
+          "color": "sky",
+          "columns": [
+            "id",
+            "type",
+            "average"
+          ]
+        },
+        {
+          "id": ".orders",
+          "position": {
+            "left": 260,
+            "top": 70
+          },
+          "size": {
+            "width": 222.36666870117188,
+            "height": 141
+          },
+          "color": "red",
+          "columns": [
+            "id",
+            "client_id",
+            "order_time&date",
+            "employee_id"
+          ]
+        },
+        {
+          "id": ".clients",
+          "position": {
+            "left": 10,
+            "top": 70
+          },
+          "size": {
+            "width": 208.28334045410156,
+            "height": 189
+          },
+          "color": "teal",
+          "columns": [
+            "id",
+            "name",
+            "surname",
+            "email",
+            "last_commit_date",
+            "password"
+          ]
+        }
+      ],
+      "createdAt": 1649492400000,
+      "updatedAt": 1717393090024
+    }
+  },
+  "settings": {
+    "defaultSchema": "public"
+  },
+  "createdAt": 1717386248579,
+  "updatedAt": 1717386248579,
+  "version": 2
+}
